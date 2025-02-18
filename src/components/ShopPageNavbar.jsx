@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 import ClothingCard from "../components/ShopPageClothingCard.jsx";
-import { shopCard } from "../data/shopCard.js";
+import { shopCard } from "../data/ShopCard.js";
 
 export default function ShopPageNavbar() {
   return (
