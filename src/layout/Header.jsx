@@ -44,7 +44,7 @@ export default function Header() {
             <span className="m-2">
               <Mail size={16} />
             </span>
-            <span className="font-bold text-[14px]">alacaksanal@gmail.com</span>
+            <span className="font-bold text-[14px]">trendigo@gmail.com</span>
           </div>
         </div>
         <div className="font-bold text-[14px] text-center">
@@ -71,7 +71,7 @@ export default function Header() {
       <div className="bg-white hidden md:flex flex-row justify-around items-center h-[78px]">
         <div className="text-2xl font-bold">
           <Link to="/" className="hover:text-black transition">
-            AlacaksanAL
+            TrendiGo
           </Link>
         </div>
         <nav className="text-[#737373] flex space-x-6 font-semibold">
@@ -196,7 +196,7 @@ export default function Header() {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1 text-[#23A6F0]">
             <FontAwesomeIcon icon={faUser} className="text-[12px]" />
-            <Link to="/" className="font-bold text-[14px]">
+            <Link to="/login" className="font-bold text-[14px]">
               Giriş Yap
             </Link>
             <span className="font-bold text-[14px]">/</span>

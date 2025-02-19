@@ -1,11 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const api = axios.create({
-  baseURL: "https://workintech-fe-ecommerce.onrender.com",
-});
+import api from "../data/axiosInstance";
 
 const Signup = () => {
   const {
