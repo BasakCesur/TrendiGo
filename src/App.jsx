@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import HomePage from "./pages/HomePage";
 import ShopPage from "./pages/ShopPage";
-import Signup from "./pages/Signup";
+import Signup from "./pages/SignUp";
 import Login from "./pages/Login";
 import { verifyToken } from "./actions/clientAction";
 import { Provider } from "react-redux";
