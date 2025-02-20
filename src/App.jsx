@@ -1,25 +1,39 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Provider } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import HomePage from "./pages/HomePage";
 import ShopPage from "./pages/ShopPage";
-import SignUp from "./pages/SignUp";
+import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import { verifyToken } from "./actions/clientAction";
+import { Provider } from "react-redux";
 import store from "./data/Store";
 
-function App() {
+function AppContent() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(verifyToken());
+  }, [dispatch]);
+
   return (
-    <Provider store={store}>
+    <>
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          {/* Diğer route'larınızı buraya ekleyebilirsiniz */}
         </Routes>
       </Router>
-    </Provider>
+    </>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <Provider store={store}>
+      <AppContent />
+    </Provider>
+  );
+}

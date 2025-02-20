@@ -39,3 +39,46 @@ export const fetchRoles = () => async (dispatch, getState) => {
     throw new Error(`Giriş başarısız! ${errorMessage}`);
   }
 };
+
+// ✅ Verify Token (Auto Login)
+export const verifyToken = () => async (dispatch) => {
+  const token = localStorage.getItem("token");
+
+  if (!token) return; // Eğer token yoksa çık
+
+  try {
+    // ✅ Token'ı Axios Header'a ekle
+    api.defaults.headers.common["Authorization"] = token; // NOT: Bearer eklemiyoruz!
+
+    // ✅ API'ye /verify isteği yap
+    const response = await api.get("/verify");
+    const userData = response.data;
+
+    // ✅ Kullanıcıyı Redux Store'a kaydet
+    dispatch(setUser(userData));
+
+    // ✅ Token'ı yenileyerek tekrar localStorage'a kaydet
+    localStorage.setItem("token", userData.token);
+    api.defaults.headers.common["Authorization"] = userData.token;
+
+    console.log("Auto Login Successful:", userData);
+  } catch (error) {
+    console.error("Auto login failed, token expired or invalid:", error);
+
+    // ❌ Token geçersizse temizle
+    localStorage.removeItem("token");
+    delete api.defaults.headers.common["Authorization"];
+  }
+};
+
+export const logoutUser = () => (dispatch) => {
+  // ✅ LocalStorage'dan token ve kullanıcı bilgilerini temizle
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  // ✅ Axios Header'dan Authorization'ı kaldır
+  delete api.defaults.headers.common["Authorization"];
+
+  // ✅ Redux store'dan kullanıcı bilgisini temizle
+  dispatch({ type: "SET_USER", payload: {} }); // 🚀 user null yerine boş nesne olmalı!
+};

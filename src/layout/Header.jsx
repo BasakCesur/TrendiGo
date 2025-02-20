@@ -19,19 +19,33 @@ import {
 
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import md5 from "md5"; // Gravatar için email hashleme
+import { logoutUser } from "../actions/clientAction";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  // Redux'tan kullanıcı bilgilerini al
+  const user = useSelector((state) => state.client.user);
+
+  // Kullanıcı giriş yapmış mı kontrol et
+  const isAuthenticated = user && user.email;
+
+  // Kullanıcı gravatar URL'sini oluştur
+  const gravatarUrl = isAuthenticated
+    ? `https://www.gravatar.com/avatar/${md5(user.email)}?d=mp`
+    : null;
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+  };
 
   return (
     <header>
-      {/* Üst Bilgi barının sadece desktopta görünmesi için "hidden md:flex" kullandım. Mobile geçtiğinde 768px ve altındayken bu class sayesinde otomatik olarak gizlenecek. */}
-      {/* sm: 640px ve üzeri
-      md: 768px ve üzeri
-      lg: 1024px ve üzeri
-      xl: 1280px ve üzeri
-      2xl: 1536px ve üzeri */}
+      {/* Üst Bilgi barı */}
       <div className="hidden md:flex bg-[#252B42] text-white justify-around items-center h-[58px]">
         <div className="flex items-center space-x-6">
           <div className="flex items-center">
@@ -67,7 +81,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Desktopta görünen üst beyaz navbar*/}
+      {/* Desktop Navbar */}
       <div className="bg-white hidden md:flex flex-row justify-around items-center h-[78px]">
         <div className="text-2xl font-bold">
           <Link to="/" className="hover:text-black transition">
@@ -78,108 +92,9 @@ export default function Header() {
           <Link to="/" className="hover:text-black transition">
             Ana Sayfa
           </Link>
-          <div className="relative">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="flex items-center text-gray-700 hover:text-black focus:outline-none transition"
-            >
-              <span className="text-[#737373] items-center flex font-semibold hover:text-black cursor-pointer">
-                <Link to="/shop" className="hover:text-black transition">
-                  Mağaza
-                </Link>
-                <ChevronDown className=" size-5 text-[#737373]" />
-              </span>
-            </button>
-
-            {isOpen && (
-              <div
-                className="absolute left-0 mt-2 w-64 bg-white border border-gray-200 shadow-lg rounded-lg z-50"
-                onMouseLeave={() => setIsOpen(false)}
-              >
-                <div className="flex flex-col p-4 gap-6">
-                  {/* Kadın ve Erkek Kategorilerini Flexbox ile Yan Yana Yapıyoruz */}
-                  <div className="flex justify-between gap-10">
-                    {/* Kadın Kategorisi */}
-                    <div className="w-1/2 pr-4 flex flex-col gap-4">
-                      <h4 className="font-bold text-black mb-2">Kadın</h4>
-                      <ul className="space-y-1 flex flex-col gap-3">
-                        <li>
-                          <Link
-                            to="/shop/women/bags"
-                            className="hover:text-black text-[#737373] font-semibold"
-                          >
-                            Çantalar
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/shop/women/belts"
-                            className="hover:text-black"
-                          >
-                            Kemerler
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/shop/women/cosmetics"
-                            className="hover:text-black"
-                          >
-                            Kozmetik
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/shop/women/hats"
-                            className="hover:text-black"
-                          >
-                            Şapkalar
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-
-                    <div className="w-1/2 flex flex-col gap-4">
-                      <h4 className="font-bold text-black mb-2">Erkek</h4>
-                      <ul className="space-y-1 flex flex-col gap-3">
-                        <li>
-                          <Link
-                            to="/shop/men/bags"
-                            className="hover:text-black"
-                          >
-                            Çantalar
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/shop/men/belts"
-                            className="hover:text-black"
-                          >
-                            Kemerler
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/shop/men/cosmetics"
-                            className="hover:text-black"
-                          >
-                            Kozmetik
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to="/shop/men/hats"
-                            className="hover:text-black"
-                          >
-                            Şapkalar
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <Link to="/shop" className="hover:text-black transition">
+            Mağaza
+          </Link>
           <Link to="/about" className="hover:text-black transition">
             Hakkımızda
           </Link>
@@ -193,17 +108,38 @@ export default function Header() {
             Sayfalar
           </Link>
         </nav>
+
+        {/* Kullanıcı Girişi Alanı */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-1 text-[#23A6F0]">
-            <FontAwesomeIcon icon={faUser} className="text-[12px]" />
-            <Link to="/login" className="font-bold text-[14px]">
-              Giriş Yap
-            </Link>
-            <span className="font-bold text-[14px]">/</span>
-            <Link to="/signup" className="font-bold text-[14px]">
-              Kayıt Ol
-            </Link>
-          </div>
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-2">
+              <img
+                src={gravatarUrl}
+                alt="User Avatar"
+                className="w-8 h-8 rounded-full"
+              />
+              <span className="text-[#23A6F0] font-bold text-[14px]">
+                {user.name || "Misafir"}
+              </span>
+              <button
+                onClick={() => dispatch(logoutUser())}
+                className="text-red-500 font-bold text-[14px] ml-2 hover:text-red-700"
+              >
+                Çıkış Yap
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-1 text-[#23A6F0]">
+              <FontAwesomeIcon icon={faUser} className="text-[12px]" />
+              <Link to="/login" className="font-bold text-[14px]">
+                Giriş Yap
+              </Link>
+              <span className="font-bold text-[14px]">/</span>
+              <Link to="/signup" className="font-bold text-[14px]">
+                Kayıt Ol
+              </Link>
+            </div>
+          )}
           <div className="flex items-center space-x-3 text-[#23A6F0]">
             <Search size={16} className="cursor-pointer" />
             <ShoppingCart size={16} className="cursor-pointer" />
@@ -212,15 +148,25 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobilde görünen sadece üst kısım. Hamburger menülü ----text-[#23A6F0] icon classnamelere bunu verirsek desktoptaki gibi mavi oluyor.*/}
+      {/* Mobil Navbar */}
       <div className="bg-white md:hidden flex justify-between items-center h-[78px] px-4">
         <div className="text-2xl font-bold">
-          <h3>AlacaksanAL</h3>
+          <Link to="/" className="hover:text-black transition">
+            TrendiGo
+          </Link>
         </div>
         <div className="flex items-center space-x-4">
-          <Link to="/">
-            <User />
-          </Link>
+          {isAuthenticated ? (
+            <img
+              src={gravatarUrl}
+              alt="User Avatar"
+              className="w-8 h-8 rounded-full"
+            />
+          ) : (
+            <Link to="/login">
+              <User />
+            </Link>
+          )}
           <Search size={20} className="cursor-pointer" />
           <ShoppingCart size={20} className="cursor-pointer" />
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -229,7 +175,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobilde Hamburger Menü Açılınca Ortalanmış Başlıklar */}
+      {/* Mobil Menü (Açılıp kapanıyor) */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white w-full shadow-lg flex flex-col items-center text-center p-4 space-y-4">
           <Link to="/" className="hover:text-black transition">
