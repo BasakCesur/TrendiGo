@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../data/axiosInstance";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   const {
@@ -12,8 +13,8 @@ const Signup = () => {
   } = useForm();
 
   const navigate = useNavigate();
-  const [roles, setRoles] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [roles, setRoles] = useState([]); // api'de roller dizi olarak tanımlı
+  const [loading, setLoading] = useState(false); // kayıt işlemi sırasında true olarak döner
 
   useEffect(() => {
     api.get("/roles").then((res) => {
@@ -24,10 +25,10 @@ const Signup = () => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      // confirmPassword alanını sil
+      // confirmPassword alanını sil. Doğrulama için tekrar şifresi sunuya gönderilmez
       delete data.confirmPassword;
 
-      // role_id'yi number'a çevir
+      // role_id'yi number'a çevir. çünkü role alanı bende string tipinde
       data.role_id = Number(data.role_id);
 
       // Eğer role_id 2 ise (mağaza sahibi), store bilgilerini düzenle
@@ -56,7 +57,7 @@ const Signup = () => {
       console.error("Hata Detayları:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Bilinmeyen bir hata oluştu.");
     } finally {
-      setLoading(false);
+      setLoading(false); // loading'in false durumunu kapatır ve butonu aktif hale getirir
     }
   };
 
@@ -182,9 +183,9 @@ const Signup = () => {
         </form>
         <p className="mt-4 text-center">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-500 hover:underline">
+          <Link to="/login" className="text-blue-500 hover:underline">
             Log in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

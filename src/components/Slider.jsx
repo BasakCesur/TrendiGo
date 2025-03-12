@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Slider({ slides }) {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0); // O olarak ayarlanıyor yani ilk sayfa açıldığında ilk slayt gösterilecek.
   const slideCount = slides.length;
   const navigate = useNavigate(); // Sayfa yönlendirme fonksiyonu , aşağıda tıklanabilir butona koydum.
 

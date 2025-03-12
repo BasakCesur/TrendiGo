@@ -18,21 +18,34 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import md5 from "md5"; // Gravatar için email hashleme
 import { logoutUser } from "../actions/clientAction";
+import { Button } from "@/components/ui/button";
+import { fetchCategories } from "../actions/productsAction"; // Import fetchCategories action
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Açılır menü durumu (kullanılmıyor şu an ama dropdown için kullanılabilir)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü durumu
+  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false); // Mağaza dropdown durumu
   const dispatch = useDispatch();
 
-  // Redux'tan kullanıcı bilgilerini al
+  // Redux'tan kullanıcı ve kategori bilgilerini al
   const user = useSelector((state) => state.client.user);
+  const categories = useSelector((state) => state.product.categories);
+  const fetchState = useSelector((state) => state.product.fetchState);
+
+  // Kategorileri cinsiyete göre filtrele
+  const kadinKategoriler = categories
+    ? categories.filter((category) => category.gender === "k")
+    : [];
+  const erkekKategoriler = categories
+    ? categories.filter((category) => category.gender === "e")
+    : [];
 
   // Kullanıcı giriş yapmış mı kontrol et
-  const isAuthenticated = user && user.email;
+  const isAuthenticated = user && user.email; // Eğer user objesi ve email varsa giriş yapmış sayılır
 
   // Kullanıcı gravatar URL'sini oluştur
   const gravatarUrl = isAuthenticated
@@ -43,6 +56,23 @@ export default function Header() {
     dispatch(logoutUser());
   };
 
+  const toggleShopDropdown = () => {
+    setIsShopDropdownOpen(!isShopDropdownOpen);
+  };
+
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return ""; // Boş string kontrolü
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
+  useEffect(() => {
+    if (fetchState === "NOT_FETCHED" || categories.length === 0) {
+      // Fetch categories if not already fetched or categories are empty
+      dispatch(fetchCategories());
+    }
+  }, [dispatch, fetchState, categories.length]); // Depend on dispatch and fetchState and categories.length
+
+  //Bileşenin UI tanımlayan jsx kodları buradan sonra başlar
   return (
     <header>
       {/* Üst Bilgi barı */}
@@ -88,13 +118,84 @@ export default function Header() {
             TrendiGo
           </Link>
         </div>
-        <nav className="text-[#737373] flex space-x-6 font-semibold">
+        <nav className="text-[#737373] flex space-x-6 font-semibold items-center">
           <Link to="/" className="hover:text-black transition">
             Ana Sayfa
           </Link>
-          <Link to="/shop" className="hover:text-black transition">
-            Mağaza
-          </Link>
+          {/* Mağaza Dropdown */}
+          <div className="relative group">
+            <button
+              className="hover:text-black transition flex items-center"
+              onClick={toggleShopDropdown}
+            >
+              Mağaza <ChevronDown size={16} className="ml-1" />
+            </button>
+            {/* Dropdown İçeriği */}
+            <div
+              className={`absolute hidden group-hover:block mt-2 w-96 bg-white border border-gray-200 rounded shadow-md z-10 ${
+                isShopDropdownOpen ? "block" : "hidden"
+              }`}
+            >
+              {fetchState === "FETCHING" ? (
+                <div className="px-4 py-2 text-gray-800">
+                  Kategoriler yükleniyor...
+                </div>
+              ) : fetchState === "FAILED" ? (
+                <div className="px-4 py-2 text-red-500">
+                  Kategorileri yüklenirken hata oluştu.
+                </div>
+              ) : (
+                <div className="flex">
+                  {" "}
+                  {/* Flex Container */}
+                  {/* Kadın Kategoriler Bölümü */}
+                  {kadinKategoriler.length > 0 && (
+                    <div className="w-1/2 p-4">
+                      <div className="font-bold text-gray-800 mb-2">Kadın</div>
+                      {kadinKategoriler.map((category) => (
+                        <Link
+                          key={category.id}
+                          to={`/shop/kadin/${category.title.toLowerCase()}/${
+                            category.id
+                          }`}
+                          className="block px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center space-x-2" // Flexbox ve boşluk EKLENDİ
+                        >
+                          <img
+                            src={category.img}
+                            alt={category.title}
+                            className="w-6 h-6 rounded object-cover" // Resim boyutları ve stil EKLENDİ
+                          />
+                          <span>{capitalizeFirstLetter(category.title)}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                  {/* Erkek Kategoriler Bölümü */}
+                  {erkekKategoriler.length > 0 && (
+                    <div className="w-1/2 p-4 border-l border-gray-200">
+                      <div className="font-bold text-gray-800 mb-2">Erkek</div>
+                      {erkekKategoriler.map((category) => (
+                        <Link
+                          key={category.id}
+                          to={`/shop/erkek/${category.title.toLowerCase()}/${
+                            category.id
+                          }`}
+                          className="block px-4 py-2 text-gray-800 hover:bg-gray-100 flex items-center space-x-2" // Flexbox ve boşluk EKLENDİ
+                        >
+                          <img
+                            src={category.img}
+                            alt={category.title}
+                            className="w-6 h-6 rounded object-cover" // Resim boyutları ve stil EKLENDİ
+                          />
+                          <span>{capitalizeFirstLetter(category.title)}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
           <Link to="/about" className="hover:text-black transition">
             Hakkımızda
           </Link>
@@ -127,6 +228,7 @@ export default function Header() {
               >
                 Çıkış Yap
               </button>
+              <Button variant="secondary">Deneme Butonu</Button>
             </div>
           ) : (
             <div className="flex items-center space-x-1 text-[#23A6F0]">
